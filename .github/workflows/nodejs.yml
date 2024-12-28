@@ -1,5 +1,5 @@
 # Name of workflow
-name: Page Loader
+name: Node CI
 
 # Trigger the workflow on push or pull request
 on:
@@ -13,12 +13,12 @@ jobs:
   build:
 
     # The type of machine to run the job on
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       # Node versions list
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        node-version: [20.x]
 
     steps:
         # Check-out repository under GitHub workspace
@@ -43,7 +43,6 @@ jobs:
         # Add Code Climate secret key
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: app/src/main/java
         with:
           coverageCommand: make test-coverage
-          coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          debug: true
