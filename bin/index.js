@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-console.log('Hello, World!');
+export default str => str.split('').reverse().join('');
