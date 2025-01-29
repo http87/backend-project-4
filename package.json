@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/http87/backend-project-4#readme",
   "bin": {
-    "index": "bin/index.js"
+    "page-loader": "bin/page_loader.js"
   },
   "devDependencies": {
     "@eslint/create-config": "^1.0.0",
@@ -29,5 +29,11 @@
     "eslint-plugin-import": "^2.31.0",
     "globals": "^15.14.0",
     "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "async": "^3.2.6",
+    "axios": "^1.7.9",
+    "commander": "^13.0.0",
+    "lodash": "^4.17.21"
   }
 }
