@@ -1,24 +1,20 @@
-import path from 'path';
+// import path from 'path';
 import fs from 'fs';
-import axios from 'axios';
+// import axios from 'axios';
+import pathCreator from './pathCreator.js';
+import imgLoader from './imgLoader.js';
+import dirCreator from './dirCreator.js';
 
 const { promises: fsp } = fs;
 
-const fileNameCreator = (url, outputPath) => {
-  const urlSplit = url.split('://');
-  const deleteSymbols = urlSplit[1].replace(/[^a-zA-Z0-9]/g, '-');
-  const fileName = `${deleteSymbols}.html`;
-  const pathToFile = path.resolve(outputPath, fileName);
-  return pathToFile;
-};
-
 const pageLoader = (url, outputPath) => {
-  const pathWriteFile = fileNameCreator(url, outputPath);
-  axios.get(url).then((urlData) => {
-    fsp.writeFile(pathWriteFile, urlData.data);
-  }).catch((err) => console.log(err));
-  console.log(pathWriteFile);
-  return pathWriteFile;
+  const { filePath, dirPath } = pathCreator(url, outputPath);
+  if (!fs.existsSync(dirPath)) {
+    const promiseDirCreator = fsp.mkdir(dirPath);
+  }
+  imgLoader(url, filePath, dirPath);
+  console.log(filePath);
+  return filePath;
 };
 
 export default pageLoader;
