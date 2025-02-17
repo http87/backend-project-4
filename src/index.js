@@ -12,9 +12,9 @@ const pageLoader = (url, outputPath) => {
   if (!fs.existsSync(dirPath)) {
     const promiseDirCreator = fsp.mkdir(dirPath);
   }
-  imgLoader(url, filePath, dirPath);
-  console.log(filePath);
-  return filePath;
+  return imgLoader(url, filePath, dirPath).then(() => {
+    console.log(filePath);
+  });
 };
 
 export default pageLoader;
