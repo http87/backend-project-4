@@ -1,34 +1,38 @@
-import fs from "fs";
-import axios from "axios";
-import path from "path";
-import * as cheerio from "cheerio";
-import urlParse, { URL } from 'url';
+import fs from 'fs';
+import axios from 'axios';
+import path from 'path';
+import * as cheerio from 'cheerio';
+import { URL } from 'url';
 
 const { promises: fsp } = fs;
 
-const imgSrcChanger = (hostname, html, dirPath) => {
+const imgCreator = (imgUrl, newSrc) => axios.get(imgUrl, { responseType: 'arraybuffer' })
+  .then((response) => fsp.writeFile(newSrc, response.data));
+
+const imgSrcChangerAndImgCreator = (hostname, html, dirPath) => {
   const $ = cheerio.load(html);
-  $("img").each(function() {
-    const hostnameReplace = hostname.replace(/[^a-zA-Z0-9]/g, '-');
-    const oldSrc = $(this).attr('src');
+  const hostnameReplace = hostname.replace(/[^a-zA-Z0-9]/g, '-');
+  $('img').each((i, img) => {
+    const oldSrc = img.attribs.src;
     const srcReplace = oldSrc.replace(/\//g, '-');
-    const newSrc = `${dirPath}/${hostnameReplace}${srcReplace}`;
-    $(this).attr("src", newSrc);
+    const newSrc = `${hostnameReplace}${srcReplace}`;
+    const imgUrl = path.join(oldSrc, oldSrc);
+    imgCreator(imgUrl, newSrc);
+    $(this).attr('src', newSrc);
   });
-  return $.html();
+  const htmlData = $.html();
+  return htmlData;
 };
 
 const imgLoader = (url, filePath, dirPath) => {
-  const address = new URL(url);
-  const hostname = address.hostname;
-
-  return axios.get(url).then((response) => {
-    // const html = response.data;
-    return fsp.readFile(path.join(process.cwd(), '__fixtures__/test.html'), 'utf-8');
-  }).then((html) => {
-    const htmlWithNewImgSrc = imgSrcChanger(hostname, html, dirPath);
-    return fsp.writeFile(filePath, htmlWithNewImgSrc);
-  }).catch((err) => console.log(err));
+  const { hostname } = new URL(url);
+  const result = axios.get(url)
+    .then(() => fsp.readFile(path.join(process.cwd(), '__fixtures__/test.html'), 'utf-8'))
+    .then((data) => {
+      const htmlData = imgSrcChangerAndImgCreator(hostname, data, dirPath);
+      return fsp.writeFile(filePath, htmlData);
+    }).catch((err) => console.log(err));
+  return result;
 };
 
 export default imgLoader;
